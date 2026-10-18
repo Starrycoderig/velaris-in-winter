@@ -1,0 +1,10 @@
+{
+  "name": "Velaris in Winter — Study Planner",
+  "short_name": "Velaris Study",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#100a1e",
+  "theme_color": "#130d22",
+  "description": "A moonlit fantasy study planner that syncs across devices.",
+  "icons": [{"src":"./icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+}

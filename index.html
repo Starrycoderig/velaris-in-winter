@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#130d22">
+  <meta name="description" content="A moonlit fantasy study planner that syncs across your devices.">
+  <title>Velaris in Winter — Study Planner</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500;1,600&family=EB+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./config.js"></script>
+  <script defer src="./app.js"></script>
+</head>
+<body>
+  <div class="sky" aria-hidden="true">
+    <div class="moon"></div><div class="starfield"></div><div class="snow" id="snow"></div>
+  </div>
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="Velaris in Winter home"><span class="brand-mark">✦</span><span>VELARIS <i>IN WINTER</i></span></a>
+    <div class="top-actions">
+      <span id="syncPill" class="sync-pill" data-state="local"><span class="dot"></span><span id="syncText">Saved on this device</span></span>
+      <button class="ghost-button" id="syncButton" type="button">↻ Sync</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-card">
+        <div class="eyebrow">YOUR PRIVATE LIBRARY</div>
+        <h2>Study sanctuary</h2>
+        <p class="muted">Small steps. Sharp focus. A future you can be proud of.</p>
+        <div class="nav-list" role="navigation" aria-label="Planner views">
+          <button class="nav-item active" data-view="today">☾ <span>Today</span></button>
+          <button class="nav-item" data-view="week">✧ <span>This week</span></button>
+          <button class="nav-item" data-view="all">❖ <span>All tasks</span></button>
+        </div>
+        <div class="sidebar-stats">
+          <div><strong id="streakCount">0</strong><span>day streak</span></div>
+          <div><strong id="totalDone">0</strong><span>tasks done</span></div>
+        </div>
+      </div>
+      <div class="cat-card">
+        <div class="cat-art" aria-hidden="true">🐈‍⬛</div>
+        <div class="eyebrow">THE NIGHT SHIFT</div>
+        <p id="catMessage">Your tiny familiar believes in you. Begin with one task.</p>
+        <span class="cat-stars">✦ · ˚ ✧ · ✦</span>
+      </div>
+      <div class="sidebar-foot">Made for the version of you who keeps going.</div>
+    </aside>
+
+    <section class="content">
+      <div class="hero">
+        <div class="eyebrow" id="dateLabel">THE NIGHT IS YOURS</div>
+        <h1 id="viewTitle">Today's chapter</h1>
+        <p class="hero-sub" id="heroSub">A realistic UGC NET JRF plan built around MBA exams, MAPC deadlines, conferences and recovery time.</p>
+        <div class="mission-note">
+          <strong>THE JRF QUEST · DECEMBER 2026</strong>
+          <span>First pass: 4 Nov–3 Dec · Mock/revision: 4–6 Dec · MBA midterms: 7–11 Dec · ACCS: 12–14 Dec (protected) · 16 Dec is a provisional exam date.</span>
+          <small>Move the flexible weekday blocks after your MBA timetable arrives. NTA’s final Psychology date overrides this assumption. January–February remain open for GATE (21 Feb 2027); no tasks are added after 16 December until you choose the next strategy.</small>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-copy"><span>Daily progress</span><strong id="progressText">0 / 0 complete</strong></div>
+          <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+        </div>
+      </div>
+
+      <section class="quote-panel" aria-live="polite">
+        <span class="quote-mark">“</span>
+        <div><p id="quoteText">All we have to decide is what to do with the time that is given us.</p><span id="quoteSource">J.R.R. Tolkien, <i>The Fellowship of the Ring</i></span></div>
+        <button id="newQuote" class="icon-button" type="button" aria-label="Show another encouragement">↻</button>
+      </section>
+
+      <div class="section-head">
+        <div><div class="eyebrow">YOUR QUEST LOG</div><h2 id="taskHeading">Today's tasks</h2></div>
+        <button class="outline-button" id="addTaskButton" type="button">＋ Add task</button>
+      </div>
+      <div id="taskList" class="task-list"></div>
+      <div id="emptyState" class="empty-state" hidden>
+        <div class="empty-symbol">✧</div><h3>A quiet page</h3><p>No tasks here yet. Add one or switch to another view.</p>
+      </div>
+
+      <section id="reflectionSection" class="reflection">
+        <label for="reflectionInput" class="eyebrow">A NOTE TO YOUR FUTURE SELF</label>
+        <textarea id="reflectionInput" rows="3" placeholder="What did you learn? What needs another look?"></textarea>
+        <div class="reflection-foot"><span id="reflectionStatus">Saved locally as you type</span><button id="saveReflection" class="outline-button" type="button">Save note</button></div>
+      </section>
+      <section id="recordsPanel" class="records-panel" hidden>
+        <div class="records-intro"><span class="eyebrow">BROUGHT FROM YOUR ORIGINAL SITE</span><h2>Scores, priorities & resources</h2><p>Your previous scores, topic priorities, and resource checklist are imported. Edit the values directly; changes save locally and sync after Supabase is connected.</p><p id="recordsStatus" class="records-status"></p></div>
+        <h3 class="records-section-title">Score tracker</h3><div id="scoreRecords" class="records-grid"></div>
+        <h3 class="records-section-title">Topic priorities</h3><div id="priorityRecords" class="records-grid"></div>
+        <h3 class="records-section-title">Study resources</h3><div id="resourceRecords" class="record-card resource-list"></div>
+      </section>
+    </section>
+  </main>
+
+  <dialog id="taskDialog" class="dialog">
+    <form id="taskForm" method="dialog">
+      <div class="dialog-head"><div><div class="eyebrow">ADD TO YOUR QUEST</div><h2>Write the next step</h2></div><button class="icon-button" id="closeDialog" type="button" aria-label="Close">×</button></div>
+      <label>Task name<input id="taskTitle" maxlength="140" required placeholder="e.g. Revise Research Aptitude"></label>
+      <div class="form-row">
+        <label>Date<input id="taskDate" type="date" max="2026-12-16" required></label>
+        <label>Duration (minutes)<input id="taskMinutes" type="number" min="0" max="1440" value="45"></label>
+      </div>
+      <label>Category
+        <select id="taskCategory"><option>Psychology</option><option>Paper 1</option><option>Mock test</option><option>Revision</option><option>Personal</option><option>Other</option></select>
+      </label>
+      <div class="dialog-actions"><button class="outline-button" id="cancelTask" type="button">Cancel</button><button class="primary-button" type="submit">Add task ✦</button></div>
+    </form>
+  </dialog>
+
+  <div id="rewardToast" class="reward-toast" role="status" aria-live="polite" hidden>
+    <span class="reward-spark">✦</span><div><strong id="rewardTitle">A tiny victory!</strong><p id="rewardMessage">One promise kept to yourself.</p></div><button id="dismissReward" class="icon-button" type="button" aria-label="Dismiss reward">×</button>
+  </div>
+
+  <footer class="footer">Under the same moon, on every device. <span>✦</span></footer>
+</body>
+</html>
